@@ -41,10 +41,9 @@
   </p>
   <script>
     var params = window.location.search;
-    var deepLink = 'haptiGo://route' + params;
-    document.getElementById('openBtn').href = deepLink;
-
     var p = new URLSearchParams(params);
+
+    // Mostra destinazione
     var dest = p.get('dest_name');
     if (dest) {
       document.getElementById('dest').textContent =
@@ -58,12 +57,20 @@
         var arr = JSON.parse(decodeURIComponent(wp));
         var names = arr.map(function(w) { return w.name; });
         document.getElementById('stops').textContent =
-          'Tappe: ' + names.join(' → ');
+          'Tappe: ' + names.join(' \u2192 ');
       } catch(e) {}
     }
 
-    // Tenta apertura automatica dopo 300ms
-    setTimeout(function() { window.location.href = deepLink; }, 300);
+    // Costruisci Intent URI (formato che Chrome su Android riconosce)
+    // intent://route?parametri#Intent;scheme=haptiGo;package=com.example.haptiGo;end
+    var queryString = params.substring(1); // rimuovi il ? iniziale
+    var intentUri = 'intent://route?' + queryString +
+      '#Intent;scheme=haptiGo;package=com.example.haptiGo;end';
+
+    document.getElementById('openBtn').href = intentUri;
+
+    // Tenta apertura automatica
+    setTimeout(function() { window.location.href = intentUri; }, 500);
   </script>
 </body>
 </html>
